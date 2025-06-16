@@ -7,9 +7,21 @@ import (
 	"os"
 )
 
-func ReadFile(path string) ([]string, error) {
+type FileManager struct {
+	InputFilePath  string
+	OutputFilePath string
+}
+
+func New(inputPath, outputPath string) FileManager {
+	return FileManager{
+		InputFilePath:  inputPath,
+		OutputFilePath: outputPath,
+	}
+}
+
+func (fm FileManager) ReadFile() ([]string, error) {
 	// If successful, methods on the returned file can be used for reading. Method return io.Reader interface
-	file, err := os.Open("prices.txt")
+	file, err := os.Open(fm.InputFilePath)
 	if err != nil {
 		return nil, errors.New("Failed to open file.")
 	}
@@ -32,8 +44,8 @@ func ReadFile(path string) ([]string, error) {
 	return lines, nil
 }
 
-func WriteJSON(path string, data any) error {
-	file, err := os.Create(path)
+func (fm FileManager) WriteResult(data any) error {
+	file, err := os.Create(fm.OutputFilePath)
 	if err != nil {
 		return errors.New("Failed to create file.")
 	}
