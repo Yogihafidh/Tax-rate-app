@@ -5,29 +5,32 @@ import (
 	"math"
 
 	"taxrate.com/tax/conversion"
-	"taxrate.com/tax/filemanager"
+	"taxrate.com/tax/iomanager"
 )
 
 type TaxIncludedPricesJob struct {
-	IOManager         filemanager.FileManager `json:"-"`
-	TaxRate           float64 		`json:"tax_rate"`
-	InputPrices       []float64 	`json:"input_prices"`
-	TaxIncludedPrices map[string]float64 `json:"tax_included_prices"`
+	IOManager         iomanager.IOManager `json:"-"`
+	TaxRate           float64             `json:"tax_rate"`
+	InputPrices       []float64           `json:"input_prices"`
+	TaxIncludedPrices map[string]float64  `json:"tax_included_prices"`
 }
 
 // Constructor functon to create a new TaxIncludedPricesJob instance with input price and tax rate
-func NewTaxIncludedPricesJob(fm filemanager.FileManager, taxRate float64) *TaxIncludedPricesJob {
+func NewTaxIncludedPricesJob(iom iomanager.IOManager, taxRate float64) *TaxIncludedPricesJob {
 	return &TaxIncludedPricesJob{
 		InputPrices: []float64{10, 20, 30},
 		TaxRate:     taxRate,
-		IOManager:   fm,
+		IOManager:   iom,
 	}
 }
 
 // Method Receiver for TaxIncludedPricesJob struct
-func (job *TaxIncludedPricesJob) Process() {
+func (job *TaxIncludedPricesJob) Process() error {
 	// Load data from file into InputPrices
-	job.LoadData()
+	err := job.LoadData()
+	if err != nil {
+		return err
+	}
 
 	// Create map without initial values using make function
 	result := make(map[string]float64)
@@ -41,25 +44,23 @@ func (job *TaxIncludedPricesJob) Process() {
 
 	// Assign result map to TaxIncludedPrices field of the job
 	job.TaxIncludedPrices = result
-	job.IOManager.WriteResult(job)
-	fmt.Println(result)
+	return job.IOManager.WriteResult(job)
 }
 
-func (job *TaxIncludedPricesJob) LoadData() {
+func (job *TaxIncludedPricesJob) LoadData() error {
 	// Read lines from file and store in lines slice
 	lines, err := job.IOManager.ReadFile()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	// Convert lines slice with type string to slice with float64 and store in InputPrices
 	prices, err := conversion.StringsToFloat(lines)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	// Assign prices slice to InputPrices field of the job
 	job.InputPrices = prices
+	return nil
 }
