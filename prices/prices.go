@@ -39,6 +39,7 @@ func (job *TaxIncludedPricesJob) Process() {
 
 	// Assign result map to TaxIncludedPrices field of the job
 	job.TaxIncludedPrices = result
+	filemanager.WriteJSON(fmt.Sprintf("result_%.0f.json", job.TaxRate * 100), job)
 	fmt.Println(result)
 }
 
