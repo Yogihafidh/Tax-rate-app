@@ -1,12 +1,11 @@
 package prices
 
 import (
-	"bufio"
 	"fmt"
 	"math"
-	"os"
 
 	"taxrate.com/tax/conversion"
+	"taxrate.com/tax/filemanager"
 )
 
 type TaxIncludedPricesJob struct {
@@ -44,25 +43,10 @@ func (job *TaxIncludedPricesJob) Process() {
 }
 
 func (job *TaxIncludedPricesJob) LoadData() {
-	// If successful, methods on the returned file can be used for reading. Method return io.Reader interface
-	file, err := os.Open("prices.txt")
+	// Read lines from file and store in lines slice
+	lines, err := filemanager.ReadFile("prices.txt")
 	if err != nil {
-		fmt.Println("Could not open file!", err)
-		return
-	}
-
-	// New scanner reciving input value with type io.Reader interface
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-
-	// Error handling for scanner
-	err = scanner.Err()
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		file.Close()
+		fmt.Println(err)
 		return
 	}
 
@@ -70,11 +54,9 @@ func (job *TaxIncludedPricesJob) LoadData() {
 	prices, err := conversion.StringsToFloat(lines)
 	if err != nil {
 		fmt.Println(err)
-		file.Close()
 		return
 	}
 
 	// Assign prices slice to InputPrices field of the job
 	job.InputPrices = prices
-	file.Close()
 }
