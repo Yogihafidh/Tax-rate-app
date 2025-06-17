@@ -1,6 +1,6 @@
 # 📦 Dokumentasi Proyek
 
-Proyek ini menggunakan berbagai konsep pemrograman Go yang baik, termasuk pemanfaatan interface, struct, penanganan error, manajemen file, serta pola desain seperti dependency injection dan constructor function.
+Proyek ini menggunakan berbagai konsep pemrograman Go, termasuk pemanfaatan interface, struct, penanganan error, manajemen file, serta pola desain seperti dependency injection dan constructor function.
 
 # Struktur Program
 
