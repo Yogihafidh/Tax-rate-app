@@ -25,11 +25,13 @@ func NewTaxIncludedPricesJob(iom iomanager.IOManager, taxRate float64) *TaxInclu
 }
 
 // Method Receiver for TaxIncludedPricesJob struct
-func (job *TaxIncludedPricesJob) Process() error {
+func (job *TaxIncludedPricesJob) Process(doneChan chan bool, errorChan chan error) {
 	// Load data from file into InputPrices
 	err := job.LoadData()
 	if err != nil {
-		return err
+		// Error handing when working with goroutine using error chanel
+		errorChan <- err
+		return
 	}
 
 	// Create map without initial values using make function
@@ -44,7 +46,10 @@ func (job *TaxIncludedPricesJob) Process() error {
 
 	// Assign result map to TaxIncludedPrices field of the job
 	job.TaxIncludedPrices = result
-	return job.IOManager.WriteResult(job)
+	job.IOManager.WriteResult(job)
+
+	// Send true value to channel when finish.
+	doneChan <- true
 }
 
 func (job *TaxIncludedPricesJob) LoadData() error {
